@@ -6,7 +6,7 @@
 
 ## Change Docker Command to Docker Compose
 
-* Create `docker-compose.yml` file with below content
+* `touch ~/workshop/src/react-nginx/docker-compose.yml`
 
 ```yaml
 services:
