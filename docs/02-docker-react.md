@@ -91,7 +91,7 @@ docker build -t react-nginx .
 # See newly build Docker Image
 docker images
 # Run react with nginx
-docker run -d --name react-nginx -p 8081:3000 react-nginx
+docker run -d --name react-nginx -p 8081:80 react-nginx
 # See running containers
 docker ps -a
 # Try Web Preview onport 8081
