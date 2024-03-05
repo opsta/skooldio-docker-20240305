@@ -10,19 +10,22 @@
 
 ```yaml
 services:
-  frontend:
+  react-dev:
     build:
       context: .
-    container_name: frontend
+      target: development
+    container_name: react-dev
     ports:
-      - "80:80"
+      - "8080:3000"
+    volumes:
+      - .:/app
 ```
 
 * Run Container with Docker Compose command
 
 ```bash
 # Delete current running container first
-docker rm -f react-nginx
+docker rm -f react-nginx react-dev
 
 docker compose up
 ```
