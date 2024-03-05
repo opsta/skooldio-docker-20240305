@@ -7,12 +7,12 @@ git clone https://github.com/opsta/skooldio-docker-20240305.git workshop
 cd ~/workshop/src/react-nginx/
 ```
 
-## Create Dockerfile for React with Nginx
+## Create Dockerfile for React for Development
 
 * `touch ~/workshop/src/react-nginx/Dockerfile`
 
 ```Dockerfile
-# syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1.6.0
 
 # 1. For build React app
 FROM node:20.11.1-alpine3.19 AS development
@@ -24,6 +24,7 @@ WORKDIR /app
 COPY package.json /app/package.json
 COPY package-lock.json /app/package-lock.json
 
+# ci = clean-install
 # Same as npm install
 RUN npm ci
 
@@ -33,28 +34,38 @@ ENV CI=true
 ENV PORT=3000
 
 CMD [ "npm", "start" ]
+```
 
+* Run the following command to build Docker Image and run React app
+
+```bash
+# Build Docker Image name react-nginx
+docker build -t react-dev .
+# See newly build Docker Image
+docker images
+# Run react with nginx
+docker run -d --name react-dev -v $(pwd):/app -p 8080:3000 react-dev
+# See running containers
+docker ps -a
+# Try Web Preview on port 8080 with / as path
+```
+
+* Try to change line 14 in `~/workshop/src/react-nginx/src/App.js` to `https://www.opsta.co.th`
+* Refresh web preview in browser to see the change
+
+## Create Dockerfile for React to run in production with Nginx
+
+* Append the following content to `Dockerfile`
+
+```Dockerfile
+# 2.1 For production build
 FROM development AS build
 
+# npm run build to create an optimized production build
 RUN npm run build
 
 
-FROM development as dev-envs
-RUN <<EOF
-apt-get update
-apt-get install -y --no-install-recommends git
-EOF
-
-RUN <<EOF
-useradd -s /bin/bash -m vscode
-groupadd docker
-usermod -aG docker vscode
-EOF
-# install Docker tools (cli, buildx, compose)
-COPY --from=gloursdocker/docker / /
-CMD [ "npm", "start" ]
-
-# 2. For Nginx setup
+# 2.2 For Nginx setup as result
 FROM nginx:alpine
 
 # Copy config nginx
@@ -80,10 +91,10 @@ docker build -t react-nginx .
 # See newly build Docker Image
 docker images
 # Run react with nginx
-docker run -d --name react-nginx -p 8080:8080 react-nginx
+docker run -d --name react-nginx -p 8081:3000 react-nginx
 # See running containers
 docker ps -a
-# Try Web Preview with / as path
+# Try Web Preview onport 8081
 ```
 
 ## Navigation
